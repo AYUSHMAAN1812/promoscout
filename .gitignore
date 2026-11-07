@@ -1,0 +1,32 @@
+# Secrets
+.env
+.env.*
+!.env.example
+.streamlit/secrets.toml
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+
+# Confidential Kuku inputs and derived outputs
+*.zip
+Kuku*.pdf
+artifacts/
+raw_outputs/
+private_inputs/
+submission/
+docs/STEP_11_SUBMISSION.md
+
+# Local caches
+.cache/
+.promoscout_cache/
+tmp/
+
+# Local packaging/build output
+build/
+dist/
+*.egg-info/
+

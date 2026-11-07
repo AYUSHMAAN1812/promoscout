@@ -1,0 +1,47 @@
+EPISODE NUMBER: Episode 1
+EPISODE LOGLINE: A missing heir returns during a dangerous confrontation.
+CONTINUITY NOTES: Synthetic non-confidential example created for PromoScout testing.
+
+--- SCRIPT START ---
+
+SCENE 01
+Scene heading: INT. GREAT HALL - NIGHT
+Scene start: 00:00.00
+Scene end: 01:00.00
+
+Actions and dialogue:
+
+**ACTION:**
+Start: (00:00.00) | End: (00:04.00)
+The great doors burst open in an explosion of smoke and splintered wood.
+
+**MARA (Shocked):**
+Start: (00:04.00) | End: (00:10.00)
+"Who are you?"
+
+**ACTION:**
+Start: (00:10.00) | End: (00:20.00)
+A scarred stranger walks through the smoke as the guards draw their blades.
+
+**STRANGER (Cold):**
+Start: (00:20.00) | End: (00:28.00)
+"You already know the truth."
+
+**ACTION:**
+Start: (00:28.00) | End: (00:38.00)
+He opens his hand and reveals the stolen royal crest.
+
+**MARA (Terrified):**
+Start: (00:38.00) | End: (00:48.00)
+"The rightful heir is alive?"
+
+**STRANGER (Threatening):**
+Start: (00:48.00) | End: (00:56.00)
+"Now we settle what you stole."
+
+**CAMERA:**
+Start: (00:56.00) | End: (01:00.00)
+The guards raise their blades as the scene cuts sharply to black.
+
+--- SCRIPT END ---
+
