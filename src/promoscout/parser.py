@@ -292,12 +292,19 @@ def _validate_episode(episode: Episode) -> None:
                 )
             tolerance = 0.05
             if entry.start_seconds < scene.start_seconds - tolerance or entry.end_seconds > scene.end_seconds + tolerance:
+                boundary_difference = max(
+                    scene.start_seconds - entry.start_seconds,
+                    entry.end_seconds - scene.end_seconds,
+                    0.0,
+                )
                 issues.append(
                     ValidationIssue(
                         "ENTRY_OUTSIDE_SCENE",
                         f"Entry {entry.label!r} ({seconds_to_timestamp(entry.start_seconds)}-"
                         f"{seconds_to_timestamp(entry.end_seconds)}) falls outside scene {scene.number} "
-                        f"({seconds_to_timestamp(scene.start_seconds)}-{seconds_to_timestamp(scene.end_seconds)}).",
+                        f"({seconds_to_timestamp(scene.start_seconds)}-{seconds_to_timestamp(scene.end_seconds)}) "
+                        f"by {boundary_difference:.2f}s. The entry was retained; review the source timestamp if "
+                        "frame-accurate boundary precision is required.",
                         "warning",
                         entry.source_line,
                     )

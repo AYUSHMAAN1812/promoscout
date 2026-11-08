@@ -90,8 +90,8 @@ with st.sidebar:
     upload = st.file_uploader("Screenplay input", type=["zip", "txt"], help="Upload the private Kuku ZIP or one compatible screenplay.")
     max_per_episode = st.slider("Candidates per episode", 1, 8, 5)
     evaluation_limit = st.number_input("Gemini evaluation limit", 1, 250, 10, help="Use a small limit for testing; the full run is a separate controlled step.")
-    st.caption("API key: read from local `.env` and never displayed.")
-    if st.button("Clear current run", use_container_width=True):
+    st.caption("API key configured securely through the environment or Streamlit Secrets and never displayed.")
+    if st.button("Clear current run", width="stretch"):
         reset_downstream()
         st.session_state.pop("upload_hash", None)
         st.rerun()
@@ -119,7 +119,7 @@ if st.session_state.get("upload_hash") != upload_hash:
 
 action_col, status_col = st.columns([1, 3])
 with action_col:
-    parse_clicked = st.button("1 · Parse screenplay", type="primary", use_container_width=True)
+    parse_clicked = st.button("1 · Parse screenplay", type="primary", width="stretch")
 with status_col:
     st.caption(f"Loaded `{upload.name}` · {len(data) / 1024:.1f} KB")
 
@@ -158,20 +158,21 @@ with st.expander("Input inventory and validation", expanded=bool(errors or warni
             }
             for episode in episodes
         ],
-        use_container_width=True,
+        width="stretch",
         hide_index=True,
     )
     for episode in episodes:
         for issue in episode.issues:
+            severity_label = "Blocking error" if issue.severity == "error" else "Non-blocking source warning"
             (st.error if issue.severity == "error" else st.warning)(
-                f"Episode {episode.episode_number} · {issue.code}: {issue.message}"
+                f"Episode {episode.episode_number} · {severity_label} · {issue.code}: {issue.message}"
             )
 
 if errors:
     st.error("Resolve parsing errors before candidate generation.")
     st.stop()
 
-if st.button("2 · Generate promo candidates", use_container_width=True):
+if st.button("2 · Generate promo candidates", width="stretch"):
     with st.spinner("Generating and deduplicating timestamp-valid windows…"):
         config = CandidateConfig(max_candidates_per_episode=max_per_episode)
         st.session_state.candidates = generate_show_candidates(episodes, config)
@@ -183,6 +184,10 @@ if not candidates:
     st.stop()
 
 st.success(f"Generated {len(candidates)} timestamp-valid candidates across {len(set(c.episode_number for c in candidates))} episodes.")
+st.caption(
+    "Candidates are options for evaluation, not guaranteed promos. PromoScout may return fewer recommendations "
+    "when candidates do not meet the quality thresholds."
+)
 with st.expander("Candidate shortlist", expanded=False):
     st.dataframe(
         [
@@ -197,13 +202,16 @@ with st.expander("Candidate shortlist", expanded=False):
             }
             for candidate in candidates
         ],
-        use_container_width=True,
+        width="stretch",
         hide_index=True,
     )
 
 evaluate_count = min(int(evaluation_limit), len(candidates))
-st.caption(f"Gemini will evaluate the top {evaluate_count} candidates by deterministic score. Raw responses are saved locally.")
-if st.button("3 · Evaluate selected candidates with Gemini", use_container_width=True):
+st.caption(
+    f"Gemini will evaluate the top {evaluate_count} candidates by deterministic score. "
+    "Raw responses are preserved for the current run and available through downloadable exports."
+)
+if st.button("3 · Evaluate selected candidates with Gemini", width="stretch"):
     selected = sorted(candidates, key=lambda item: item.deterministic_score, reverse=True)[:evaluate_count]
     episode_map = {episode.episode_number: episode for episode in episodes}
     evaluations = {}
@@ -248,7 +256,15 @@ decision_cols[2].metric("Rejected", sum(item.decision == "rejected" for item in 
 ranked_tab, rejected_tab, export_tab = st.tabs(["Ranked promos", "Rejected / audit", "Export"])
 with ranked_tab:
     if not ranked:
-        st.warning("No candidates passed the current safety thresholds.")
+        st.warning(
+            "No candidates passed the current safety thresholds. This is a valid outcome: broaden the candidate "
+            "pool, increase the evaluation limit, adjust boundaries during editor review, or inspect another episode."
+        )
+    elif len(ranked) < len(scored):
+        st.info(
+            f"{len(ranked)} of {len(scored)} evaluated candidates passed the current thresholds. "
+            "PromoScout does not force weak candidates into the ranked shortlist."
+        )
     for item in ranked:
         candidate = item.candidate
         evaluation = item.evaluation
@@ -299,8 +315,8 @@ with export_tab:
         csv_data = export_csv(ranked, reviews)
         markdown_data = export_markdown(ranked, reviews)
         download_cols = st.columns(3)
-        download_cols[0].download_button("Download JSON", json_data, "promoscout_ranked.json", "application/json", use_container_width=True)
-        download_cols[1].download_button("Download CSV", csv_data, "promoscout_ranked.csv", "text/csv", use_container_width=True)
-        download_cols[2].download_button("Download Markdown", markdown_data, "promoscout_ranked.md", "text/markdown", use_container_width=True)
+        download_cols[0].download_button("Download JSON", json_data, "promoscout_ranked.json", "application/json", width="stretch")
+        download_cols[1].download_button("Download CSV", csv_data, "promoscout_ranked.csv", "text/csv", width="stretch")
+        download_cols[2].download_button("Download Markdown", markdown_data, "promoscout_ranked.md", "text/markdown", width="stretch")
         st.caption("Exports contain confidential screenplay excerpts and should only be shared through the authorized assignment route.")
 

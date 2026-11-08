@@ -87,7 +87,10 @@ class ScreenplayParserTests(unittest.TestCase):
             "Start: (00:32.00) | End: (01:05.00)",
         )
         episode = parse_screenplay(bad)
-        self.assertIn("ENTRY_OUTSIDE_SCENE", {issue.code for issue in episode.issues})
+        matching = [issue for issue in episode.issues if issue.code == "ENTRY_OUTSIDE_SCENE"]
+        self.assertEqual(len(matching), 1)
+        self.assertIn("by 5.00s", matching[0].message)
+        self.assertIn("entry was retained", matching[0].message)
 
     def test_rejects_missing_episode_number(self) -> None:
         with self.assertRaises(ScreenplayParseError):
