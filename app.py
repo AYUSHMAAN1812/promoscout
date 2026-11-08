@@ -255,14 +255,20 @@ decision_cols[2].metric("Rejected", sum(item.decision == "rejected" for item in 
 
 ranked_tab, rejected_tab, export_tab = st.tabs(["Ranked promos", "Rejected / audit", "Export"])
 with ranked_tab:
+    non_rejected_count = sum(item.decision != "rejected" for item in scored)
     if not ranked:
         st.warning(
             "No candidates passed the current safety thresholds. This is a valid outcome: broaden the candidate "
             "pool, increase the evaluation limit, adjust boundaries during editor review, or inspect another episode."
         )
-    elif len(ranked) < len(scored):
+    elif len(ranked) < non_rejected_count:
         st.info(
-            f"{len(ranked)} of {len(scored)} evaluated candidates passed the current thresholds. "
+            f"{non_rejected_count} of {len(scored)} evaluated candidates cleared the quality thresholds; "
+            f"{len(ranked)} entered the primary ranked shortlist after overlap and story-diversity controls."
+        )
+    elif non_rejected_count < len(scored):
+        st.info(
+            f"{non_rejected_count} of {len(scored)} evaluated candidates cleared the quality thresholds. "
             "PromoScout does not force weak candidates into the ranked shortlist."
         )
     for item in ranked:
